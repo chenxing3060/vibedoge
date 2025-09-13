@@ -172,9 +172,9 @@ const HomePage: React.FC = () => {
   };
 
   // 计算统计数据
-  const totalMessages = messages.length;
-  const totalLikes = messages.reduce((sum, message) => sum + message.likes, 0);
-  const uniqueUsers = new Set(messages.map(message => message.username)).size;
+  const totalMessages = messages.reduce((sum, msg) => sum + 1, 0);
+  const totalLikes = messages.reduce((sum, msg) => sum + msg.likes, 0);
+  const uniqueUsers = new Set(messages.map(msg => msg.username)).size;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -185,19 +185,19 @@ const HomePage: React.FC = () => {
       />
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* 动态背景 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-100/30 via-white/50 to-purple-100/30"></div>
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-128 h-128 bg-pink-200/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
+        
+        {/* 动态背景装饰 */}
+        <div className="absolute inset-0 z-10">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-200/15 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-200/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-128 h-128 bg-pink-200/8 rounded-full blur-3xl animate-pulse delay-2000"></div>
           {/* 金色光晕效果 */}
-          <div className="absolute top-1/3 right-1/3 w-80 h-80 bg-gradient-to-r from-yellow-300/30 to-amber-400/30 rounded-full blur-3xl animate-pulse delay-500"></div>
-          <div className="absolute bottom-1/3 left-1/3 w-64 h-64 bg-gradient-to-r from-amber-300/25 to-yellow-400/25 rounded-full blur-2xl animate-pulse delay-1500"></div>
-          <div className="absolute top-2/3 left-2/3 w-48 h-48 bg-gradient-to-r from-yellow-400/20 to-amber-500/20 rounded-full blur-xl animate-pulse delay-3000"></div>
+          <div className="absolute top-1/3 right-1/3 w-80 h-80 bg-gradient-to-r from-yellow-300/20 to-amber-400/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+          <div className="absolute bottom-1/3 left-1/3 w-64 h-64 bg-gradient-to-r from-amber-300/15 to-yellow-400/15 rounded-full blur-2xl animate-pulse delay-1500"></div>
+          <div className="absolute top-2/3 left-2/3 w-48 h-48 bg-gradient-to-r from-yellow-400/12 to-amber-500/12 rounded-full blur-xl animate-pulse delay-3000"></div>
         </div>
         
-        <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="relative z-20 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -222,6 +222,38 @@ const HomePage: React.FC = () => {
             <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-12">
               在Vibe Coding时代，真正稀缺的不是代码，而是经过认证的人才、精心设计的规则、强大的MCP服务，以及未被AI污染的有机项目
             </p>
+          </motion.div>
+          
+          {/* 嵌入式视频播放器 */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.3 }}
+            className="mb-12 flex justify-center"
+          >
+            <div className="relative w-full max-w-4xl mx-auto">
+              <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl border-4 border-amber-200/50 hover:border-amber-300/70 transition-all duration-300">
+                <video 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline
+                  controls
+                  className="w-full h-full object-cover"
+                  poster="/vibedoge-poster.jpg"
+                >
+                  <source src="/vibedoge.mp4" type="video/mp4" />
+                  您的浏览器不支持视频播放。
+                </video>
+                {/* 视频装饰边框 */}
+                <div className="absolute inset-0 rounded-2xl border-2 border-gradient-to-r from-amber-400/30 via-yellow-400/30 to-amber-400/30 pointer-events-none"></div>
+              </div>
+              {/* 视频标题 */}
+              <div className="text-center mt-4">
+                <p className="text-lg font-semibold text-gray-700 mb-2">🐕 VibeDoge 平台介绍</p>
+                <p className="text-sm text-gray-500">了解我们如何发现和认证稀缺资源</p>
+              </div>
+            </div>
           </motion.div>
           
           <motion.div
