@@ -29,6 +29,8 @@ interface UserState {
   updateUserActivity: () => void;
   useDraw: () => boolean; // 使用一次抽奖机会
   getRemainingDraws: () => number; // 获取剩余抽奖次数
+  setRemainingDraws: (count: number) => void; // 设置剩余抽奖次数
+  clearSession: () => void; // 清除会话
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -77,18 +79,18 @@ export const useUserStore = create<UserState>((set, get) => ({
           const result = await response.json();
           if (result.success) {
             // 无限抽奖模式，设置大数值
-            mcpService.setRemainingDraws(999999);
+            mcpService.setRemainingDraws();
             set({ remainingDraws: 999999 });
           }
         } catch (error) {
           console.warn('Failed to sync remaining draws from backend:', error);
           // 即使同步失败也设置为无限模式
-          mcpService.setRemainingDraws(999999);
+          mcpService.setRemainingDraws();
           set({ remainingDraws: 999999 });
         }
       } else {
         // 未注册用户也设置为无限模式
-        mcpService.setRemainingDraws(999999);
+        mcpService.setRemainingDraws();
         set({ remainingDraws: 999999 });
       }
       
@@ -208,7 +210,7 @@ export const useUserStore = create<UserState>((set, get) => ({
 
   // 设置剩余抽奖次数（从后端同步）
   setRemainingDraws: (count: number) => {
-    mcpService.setRemainingDraws(count);
+    mcpService.setRemainingDraws();
     set({ remainingDraws: count });
   }
 }));
@@ -267,6 +269,7 @@ interface LotteryState {
   setGlobalStats: (stats: LotteryState['globalStats']) => void;
   loadUserLotteries: (userId: string) => Promise<void>;
   loadUserStats: (userId: string) => Promise<void>;
+  loadUserLotteryInfo: (userId: string) => Promise<any>;
   loadGlobalStats: () => Promise<void>;
   generateLotteryId: (userId: string) => Promise<{ success: boolean; lotteryId?: string; error?: string }>;
   drawLottery: (lotteryId: string, userId: string) => Promise<{ success: boolean; prize?: any; error?: string }>;
@@ -326,7 +329,6 @@ export const useLotteryStore = create<LotteryState>((set, get) => ({
       const result = await response.json();
       
       if (result.success) {
-        const { remainingDraws } = result.data.lotteryStats;
         // 这里我们不能直接更新其他store，需要在组件中处理
         return result.data;
       } else {

@@ -36,7 +36,10 @@ class MCPService {
       lastActiveAt: now,
       sessionToken: this.generateSessionToken(),
       remainingDraws: 999999, // 无限抽奖模式
-      isRegistered: false
+      isRegistered: false,
+      username: `用户${userId.slice(-6)}`, // 默认用户名
+      totalMessages: 0,
+      totalLikes: 0
     };
 
     this.currentUser = user;
@@ -122,7 +125,7 @@ class MCPService {
   }
 
   // 设置剩余抽奖次数（从后端同步）
-  setRemainingDraws(count: number): void {
+  setRemainingDraws(): void {
     if (this.currentUser) {
       // 无限抽奖模式，始终设置为大量次数
       this.currentUser.remainingDraws = 999999;

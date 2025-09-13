@@ -172,7 +172,7 @@ const HomePage: React.FC = () => {
   };
 
   // 计算统计数据
-  const totalMessages = messages.reduce((sum, msg) => sum + 1, 0);
+  const totalMessages = messages.length;
   const totalLikes = messages.reduce((sum, msg) => sum + msg.likes, 0);
   const uniqueUsers = new Set(messages.map(msg => msg.username)).size;
 

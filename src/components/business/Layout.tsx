@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Gift, BarChart3, Info, Users, Menu, X } from 'lucide-react';
+import { Home, Gift, BarChart3, Info, Users, Menu, X, TrendingUp } from 'lucide-react';
 import { useUIStore } from '../../store';
 
 interface LayoutProps {
@@ -14,6 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigation = [
     { name: '首页', href: '/', icon: Home, current: false },
     { name: '抽奖详情', href: '/lottery/detail', icon: Gift, current: false },
+    { name: '交易市场', href: '/market', icon: TrendingUp, current: false },
     { name: '社区广场', href: '/community', icon: Users, current: false },
     { name: '全球统计', href: '/global-stats', icon: BarChart3, current: false },
     { name: '关于我们', href: '/about', icon: Info, current: false },

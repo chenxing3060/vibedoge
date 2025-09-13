@@ -11,10 +11,7 @@ import {
   Database,
   BarChart3,
   Dog,
-  Shield,
   Play,
-  ChevronDown,
-  ChevronUp,
   Info,
   Users,
   Target,
@@ -249,7 +246,7 @@ const LotteryDetailPage: React.FC = () => {
     loadGlobalStats: getGlobalStats
   } = useLotteryStore();
 
-  const { mcpUser, initializeMCPUser, registerUser, remainingDraws, useDraw, setRemainingDraws, clearSession } = useUserStore();
+  const { mcpUser, initializeMCPUser, registerUser, remainingDraws, clearSession } = useUserStore();
 
   const [loading, setLoading] = useState(false);
   const [showResult, setShowResult] = useState(false);
