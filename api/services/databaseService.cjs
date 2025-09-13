@@ -1,5 +1,13 @@
 const supabase = require('../../config/supabase.cjs');
-const { v4: uuidv4 } = require('uuid');
+
+// 简单的 UUID 生成函数
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 class DatabaseService {
   constructor() {
@@ -12,7 +20,7 @@ class DatabaseService {
       const { data, error } = await this.supabase
         .from('users')
         .insert([{
-          id: uuidv4(),
+          id: generateUUID(),
           mcp_user_id: mcpUserId,
           username: userData.username || `User_${mcpUserId.split('_').pop()}`,
           email: userData.email || `${mcpUserId}@mcp.local`,
@@ -85,7 +93,7 @@ class DatabaseService {
       const { data, error } = await this.supabase
         .from('lottery_records')
         .insert([{
-          id: uuidv4(),
+          id: generateUUID(),
           user_id: userId,
           lottery_id: lotteryData.lotteryId,
           status: lotteryData.status || 'active',

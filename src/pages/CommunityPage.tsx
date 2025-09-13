@@ -14,12 +14,12 @@ const CommunityPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [currentUser] = useState('游客用户'); // 实际项目中应该从用户认证系统获取
-    
+
     // 话题相关状态
     const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
     const [showCreateTopic, setShowCreateTopic] = useState(false);
     const [isCreatingTopic, setIsCreatingTopic] = useState(false);
-    
+
     // 实时更新状态
     const [isRealtimeConnected, setIsRealtimeConnected] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<Date | undefined>();
@@ -116,8 +116,8 @@ const CommunityPage: React.FC = () => {
         try {
             const response = await communityService.likeMessage(messageId, currentUser);
             if (response.success && response.data) {
-                setMessages(messages.map(msg => 
-                    msg.id === messageId 
+                setMessages(messages.map(msg =>
+                    msg.id === messageId
                         ? { ...msg, likes: response.data!.likes }
                         : msg
                 ));
@@ -136,7 +136,7 @@ const CommunityPage: React.FC = () => {
         const messagesSubscription = communityService.subscribeToMessages((payload) => {
             console.log('留言实时更新:', payload);
             setLastUpdate(new Date());
-            
+
             if (payload.eventType === 'INSERT') {
                 // 新留言插入
                 const newMessage = {
@@ -150,8 +150,8 @@ const CommunityPage: React.FC = () => {
                 setMessages(prev => [newMessage, ...prev]);
             } else if (payload.eventType === 'UPDATE') {
                 // 留言更新（如点赞）
-                setMessages(prev => prev.map(msg => 
-                    msg.id === payload.new.id 
+                setMessages(prev => prev.map(msg =>
+                    msg.id === payload.new.id
                         ? {
                             ...msg,
                             likes: payload.new.likes,
@@ -168,7 +168,7 @@ const CommunityPage: React.FC = () => {
         const topicsSubscription = communityService.subscribeToTopics((payload) => {
             console.log('话题实时更新:', payload);
             setLastUpdate(new Date());
-            
+
             if (payload.eventType === 'INSERT') {
                 // 新话题插入
                 const newTopic = {
@@ -184,8 +184,8 @@ const CommunityPage: React.FC = () => {
                 setTopics(prev => [newTopic, ...prev]);
             } else if (payload.eventType === 'UPDATE') {
                 // 话题更新
-                setTopics(prev => prev.map(topic => 
-                    topic.id === payload.new.id 
+                setTopics(prev => prev.map(topic =>
+                    topic.id === payload.new.id
                         ? {
                             ...topic,
                             messages: payload.new.messages || 0,
@@ -216,7 +216,7 @@ const CommunityPage: React.FC = () => {
         const now = new Date();
         const diff = now.getTime() - date.getTime();
         const minutes = Math.floor(diff / (1000 * 60));
-        
+
         if (minutes < 1) return '刚刚';
         if (minutes < 60) return `${minutes}分钟前`;
         if (minutes < 1440) return `${Math.floor(minutes / 60)}小时前`;
@@ -226,9 +226,9 @@ const CommunityPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-slate-50">
             {/* 实时状态指示器 */}
-            <RealtimeIndicator 
-                isConnected={isRealtimeConnected} 
-                lastUpdate={lastUpdate} 
+            <RealtimeIndicator
+                isConnected={isRealtimeConnected}
+                lastUpdate={lastUpdate}
             />
             {/* Hero Section */}
             <div className="relative overflow-hidden">
@@ -260,22 +260,20 @@ const CommunityPage: React.FC = () => {
                     <div className="bg-white/75 backdrop-blur-md rounded-full p-1 border border-white/90">
                         <button
                             onClick={() => setActiveTab('messages')}
-                            className={`px-6 py-3 rounded-full transition-all duration-300 ${
-                                activeTab === 'messages'
+                            className={`px-6 py-3 rounded-full transition-all duration-300 ${activeTab === 'messages'
                                     ? 'bg-blue-600/90 backdrop-blur-sm text-white shadow-lg border border-blue-700/90'
                                     : 'text-slate-700 hover:text-slate-900 hover:bg-white/75'
-                            }`}
+                                }`}
                         >
                             <MessageSquare className="w-5 h-5 inline-block mr-2" />
                             实时留言
                         </button>
                         <button
                             onClick={() => setActiveTab('topics')}
-                            className={`px-6 py-3 rounded-full transition-all duration-300 ${
-                                activeTab === 'topics'
+                            className={`px-6 py-3 rounded-full transition-all duration-300 ${activeTab === 'topics'
                                     ? 'bg-blue-600/90 backdrop-blur-sm text-white shadow-lg border border-blue-700/90'
                                     : 'text-slate-700 hover:text-slate-900 hover:bg-white/75'
-                            }`}
+                                }`}
                         >
                             <Users className="w-5 h-5 inline-block mr-2" />
                             话题讨论
@@ -369,7 +367,7 @@ const CommunityPage: React.FC = () => {
                                                 </div>
                                                 <p className="text-slate-600 mb-3">{message.content}</p>
                                                 <div className="flex items-center gap-4">
-                                                    <button 
+                                                    <button
                                                         onClick={() => handleLikeMessage(message.id)}
                                                         className="flex items-center gap-1 text-slate-500 hover:text-pink-500 transition-colors"
                                                     >

@@ -1,5 +1,13 @@
 const databaseService = require('../services/databaseService.cjs');
-const { v4: uuidv4 } = require('uuid');
+
+// 简单的 UUID 生成函数
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 class LotteryController {
   constructor() {
@@ -86,7 +94,7 @@ class LotteryController {
       }
 
       // 生成抽奖ID
-      const lotteryId = uuidv4();
+      const lotteryId = generateUUID();
       const timestamp = new Date().toISOString();
 
       // 创建抽奖记录
