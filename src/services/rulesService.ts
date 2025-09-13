@@ -176,34 +176,7 @@ export async function getAllRules(): Promise<Rule[]> {
     return mockRules;
 }
 
-// 根据文件名确定分类
-function getCategoryFromFilename(filename: string): string {
-    const name = filename.toLowerCase();
-    
-    if (name.includes('react') || name.includes('vue') || name.includes('svelte')) {
-        return '前端框架';
-    }
-    if (name.includes('typescript') || name.includes('javascript')) {
-        return '编程语言';
-    }
-    if (name.includes('nextjs') || name.includes('fastapi') || name.includes('express')) {
-        return '全栈框架';
-    }
-    if (name.includes('database') || name.includes('sql')) {
-        return '数据库';
-    }
-    if (name.includes('tailwind') || name.includes('css')) {
-        return '样式';
-    }
-    if (name.includes('clean') || name.includes('quality')) {
-        return '代码质量';
-    }
-    if (name.includes('git')) {
-        return '版本控制';
-    }
-    
-    return '其他';
-}
+
 
 // 按分类获取规则
 export async function getRulesByCategory(): Promise<RuleCategory[]> {
