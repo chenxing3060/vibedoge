@@ -66,11 +66,19 @@ app.use((req, res) => {
 });
 
 // 启动服务器
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`🚀 Vibe Coding抽奖API服务器运行在端口 ${PORT}`);
     console.log(`📡 API地址: http://localhost:${PORT}/api`);
     console.log(`🏥 健康检查: http://localhost:${PORT}/api/health`);
     console.log(`🎲 Vibe Coding抽奖API: http://localhost:${PORT}/api/lottery`);
+});
+
+server.on('error', (err) => {
+    console.error('❌ 服务器启动失败:', err.message);
+    if (err.code === 'EADDRINUSE') {
+        console.error(`❌ 端口 ${PORT} 已被占用`);
+    }
+    process.exit(1);
 });
 
 // 优雅关闭

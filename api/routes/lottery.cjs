@@ -28,6 +28,14 @@ router.post('/generate-lottery-id', lotteryController.generateLotteryId.bind(lot
 router.get('/user-lotteries/:userId', lotteryController.getUserLotteries.bind(lotteryController));
 
 /**
+ * @route GET /api/lottery/user-info/:userId
+ * @desc 获取用户抽奖信息（包含剩余次数）
+ * @access Public
+ * @param {string} userId - 用户ID
+ */
+router.get('/user-info/:userId', lotteryController.getUserLotteryInfo.bind(lotteryController));
+
+/**
  * @route GET /api/lottery/info/:lotteryId
  * @desc 获取抽奖详细信息
  * @access Public
@@ -100,5 +108,6 @@ router.get('/daily-stats', lotteryController.getDailyStats.bind(lotteryControlle
  * @access Public
  */
 router.get('/membership-stats', lotteryController.getMembershipStats.bind(lotteryController));
+
 
 module.exports = router;

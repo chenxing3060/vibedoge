@@ -38,7 +38,7 @@ export const useUserStore = create<UserState>((set, get) => ({
   isAuthenticated: false,
   isInitialized: false,
   isRegistered: false,
-  remainingDraws: 0,
+  remainingDraws: 999999, // 默认无限抽奖模式
   
   // 初始化MCP用户
   initializeMCPUser: async () => {
@@ -70,6 +70,28 @@ export const useUserStore = create<UserState>((set, get) => ({
         remainingDraws: mcpUser.remainingDraws
       });
       
+      // 如果用户已注册，从后端同步最新的剩余抽奖次数（无限模式）
+      if (mcpUser.isRegistered) {
+        try {
+          const response = await fetch(`/api/lottery/user-info/${mcpUser.id}`);
+          const result = await response.json();
+          if (result.success) {
+            // 无限抽奖模式，设置大数值
+            mcpService.setRemainingDraws(999999);
+            set({ remainingDraws: 999999 });
+          }
+        } catch (error) {
+          console.warn('Failed to sync remaining draws from backend:', error);
+          // 即使同步失败也设置为无限模式
+          mcpService.setRemainingDraws(999999);
+          set({ remainingDraws: 999999 });
+        }
+      } else {
+        // 未注册用户也设置为无限模式
+        mcpService.setRemainingDraws(999999);
+        set({ remainingDraws: 999999 });
+      }
+      
       console.log('MCP User initialized:', mcpUser.id);
     } catch (error) {
       console.error('Failed to initialize MCP user:', error);
@@ -90,6 +112,9 @@ export const useUserStore = create<UserState>((set, get) => ({
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ 
+          userId: mcpUser.id 
+        }),
       });
 
       const result = await response.json();
@@ -105,13 +130,13 @@ export const useUserStore = create<UserState>((set, get) => ({
           updated_at: result.data.createdAt
         };
         
-        // 注册成功，发放抽奖次数
-        mcpService.registerSuccess(3); // 给予3次抽奖机会
+        // 注册成功，使用后端返回的抽奖次数（现在为无限模式）
+        mcpService.registerSuccess(999999); // 设置为无限抽奖
         
         set({ 
           databaseUser, 
           isRegistered: true,
-          remainingDraws: 3,
+          remainingDraws: 999999, // 无限抽奖模式
           user: {
             ...get().user!,
             id: result.data.userId,
@@ -139,7 +164,22 @@ export const useUserStore = create<UserState>((set, get) => ({
       databaseUser: null, 
       mcpUser: null, 
       isAuthenticated: false,
-      isRegistered: false 
+      isRegistered: false,
+      remainingDraws: 0
+    });
+  },
+
+  // 清除会话并重新开始
+  clearSession: () => {
+    mcpService.clearSession();
+    set({ 
+      user: null, 
+      databaseUser: null, 
+      mcpUser: null, 
+      isAuthenticated: false,
+      isRegistered: false,
+      remainingDraws: 0,
+      isInitialized: false
     });
   },
   
@@ -164,6 +204,12 @@ export const useUserStore = create<UserState>((set, get) => ({
   // 获取剩余抽奖次数
   getRemainingDraws: () => {
     return mcpService.getRemainingDraws();
+  },
+
+  // 设置剩余抽奖次数（从后端同步）
+  setRemainingDraws: (count: number) => {
+    mcpService.setRemainingDraws(count);
+    set({ remainingDraws: count });
   }
 }));
 
@@ -272,6 +318,26 @@ export const useLotteryStore = create<LotteryState>((set, get) => ({
       console.error('Error loading user stats:', error);
     }
   },
+
+  // 加载用户抽奖信息（包含剩余次数）
+  loadUserLotteryInfo: async (userId: string) => {
+    try {
+      const response = await fetch(`/api/lottery/user-info/${userId}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        const { remainingDraws } = result.data.lotteryStats;
+        // 这里我们不能直接更新其他store，需要在组件中处理
+        return result.data;
+      } else {
+        console.error('Failed to load user lottery info:', result.message);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error loading user lottery info:', error);
+      return null;
+    }
+  },
   
   // 加载全局统计
   loadGlobalStats: async () => {
@@ -335,6 +401,14 @@ export const useLotteryStore = create<LotteryState>((set, get) => ({
         await get().loadUserLotteries(userId);
         await get().loadUserStats(userId);
         await get().loadGlobalStats();
+        
+        // 更新剩余抽奖次数
+        if (result.data.lotteryStats) {
+          const { remainingDraws } = result.data.lotteryStats;
+          const userStore = useUserStore.getState();
+          userStore.setRemainingDraws(remainingDraws);
+        }
+        
         set({ isDrawing: false });
         return { success: true, prize: result.data.prize };
       } else {

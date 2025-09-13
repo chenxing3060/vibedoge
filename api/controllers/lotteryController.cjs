@@ -1,37 +1,72 @@
 const databaseService = require('../services/databaseService.cjs');
-const { v4: uuidv4 } = require('uuid');
+
+// 简单的 UUID 生成函数
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 class LotteryController {
-  // 生成用户ID并注册用户
+  constructor() {
+    console.log('🎯 INFINITE LOTTERY CONTROLLER LOADED');
+  }
+
+    // 生成用户ID并注册用户
   async generateUserId(req, res) {
     try {
-      // 生成MCP格式用户ID: mcp_timestamp_randomstring
-      const timestamp = Date.now();
-      const randomString = Math.random().toString(36).substring(2, 15);
-      const userId = `mcp_${timestamp}_${randomString}`;
+      // 如果请求中提供了userId，说明是已存在的MCP用户要注册
+      let userId = req.body.userId;
+      let isExistingUser = false;
+      
+      if (!userId) {
+        // 生成新的MCP格式用户ID: mcp_timestamp_randomstring
+        const timestamp = Date.now();
+        const randomString = Math.random().toString(36).substring(2, 15);
+        userId = `mcp_${timestamp}_${randomString}`;
+      } else {
+        // 检查用户是否已存在
+        const existingUser = await databaseService.getUserByMcpId(userId);
+        if (existingUser) {
+          isExistingUser = true;
+        }
+      }
+      
       const isoTimestamp = new Date().toISOString();
 
-      // 在数据库中创建用户记录
-      const user = await databaseService.createUser(userId, {
-        username: `User_${randomString}`,
-        email: `${userId}@mcp.local`
-      });
+      let user;
+      if (isExistingUser) {
+        user = await databaseService.getUserByMcpId(userId);
+      } else {
+        // 在数据库中创建用户记录
+        user = await databaseService.createUser(userId, {
+          username: `User_${userId.split('_').pop()}`,
+          email: `${userId}@mcp.local`
+        });
+      }
 
+      // 无限抽奖模式 - 不需要计算剩余次数
       res.json({
         success: true,
         data: {
           userId: userId,
           databaseUserId: user.id,
           createdAt: isoTimestamp,
-          username: user.username
+          username: user.username,
+          isInfiniteMode: true, // 标识为无限模式
+          isNewUser: !isExistingUser
         },
-        message: 'Vibe Coding抽奖用户ID生成成功'
+        message: isExistingUser 
+          ? `Vibe 抽奖用户信息已更新，开启无限抽奖模式！`
+          : 'Vibe 抽奖用户注册成功，开启无限抽奖模式！'
       });
     } catch (error) {
       console.error('Error in generateUserId:', error);
       res.status(500).json({
         success: false,
-        message: '生成Vibe Coding抽奖用户ID失败',
+        message: '生成Vibe抽奖用户ID失败',
         error: error.message
       });
     }
@@ -59,7 +94,7 @@ class LotteryController {
       }
 
       // 生成抽奖ID
-      const lotteryId = uuidv4();
+      const lotteryId = generateUUID();
       const timestamp = new Date().toISOString();
 
       // 创建抽奖记录
@@ -220,6 +255,21 @@ class LotteryController {
           message: '此抽奖已经执行过或状态不正确'
         });
       }
+
+      // 获取用户信息并检查抽奖次数限制
+      const user = await databaseService.getUserByMcpId(userId);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: '用户不存在'
+        });
+      }
+
+      // 无限抽奖模式 - 不需要检查抽奖次数
+      console.log('🎯 INFINITE DRAW - No limits checking for user:', userId);
+      
+      // 获取用户历史记录（仅用于统计）
+      const userLotteries = await databaseService.getUserLotteries(user.id);
 
       // MCP抽奖逻辑 - 超级丰富的VibeDoge生态奖品
       const prizes = [
@@ -474,9 +524,13 @@ class LotteryController {
           mcpBonus: {
             type: 'mcp_free_lottery',
             message: 'MCP用户专享免费抽奖'
+          },
+          lotteryStats: {
+            isInfiniteMode: true,
+            totalDraws: (userLotteries?.length || 0) + 1
           }
         },
-        message: `🎉 恭喜获得 ${selectedPrize.icon} ${selectedPrize.name}！`
+        message: `🎉 恭喜获得 ${selectedPrize.icon} ${selectedPrize.name}！无限抽奖模式继续！`
       });
     } catch (error) {
       console.error('Error in drawLottery:', error);
@@ -755,6 +809,56 @@ class LotteryController {
       });
     }
   }
+
+  // 获取用户抽奖次数信息
+  async getUserLotteryInfo(req, res) {
+    try {
+      const { userId } = req.params;
+      
+      if (!userId) {
+        return res.status(400).json({
+          success: false,
+          message: '用户ID不能为空'
+        });
+      }
+
+      // 查找用户
+      const user = await databaseService.getUserByMcpId(userId);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: '用户不存在'
+        });
+      }
+
+      // 获取用户抽奖记录
+      const lotteries = await databaseService.getUserLotteries(user.id);
+      const completedLotteries = lotteries.filter(l => l.status === 'completed');
+
+      // 无限抽奖模式 - 不限制抽奖次数
+      res.json({
+        success: true,
+        data: {
+          userId: userId,
+          username: user.username,
+          lotteryStats: {
+            isInfiniteMode: true,
+            totalDraws: lotteries.length,
+            completedDraws: completedLotteries.length
+          }
+        },
+        message: '获取用户抽奖信息成功 - 无限抽奖模式'
+      });
+    } catch (error) {
+      console.error('Error in getUserLotteryInfo:', error);
+      res.status(500).json({
+        success: false,
+        message: '获取用户抽奖信息失败',
+        error: error.message
+      });
+    }
+  }
 }
 
 module.exports = new LotteryController();
+

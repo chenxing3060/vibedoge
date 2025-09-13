@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  ArrowRight, 
-  Sparkles, 
-  Heart, 
-  Users, 
-  Zap, 
+import {
+  ArrowRight,
+  Sparkles,
+  Heart,
+  Users,
+  Zap,
   Gift,
   MessageCircle,
   Smile,
@@ -24,12 +24,12 @@ import RealtimeIndicator from '../components/RealtimeIndicator';
 
 const HomePage: React.FC = () => {
   const { } = useUIStore();
-  
+
   // 真实数据状态
   const [messages, setMessages] = useState<Message[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // 实时更新状态
   const [isRealtimeConnected, setIsRealtimeConnected] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | undefined>();
@@ -46,7 +46,7 @@ const HomePage: React.FC = () => {
     const loadData = async () => {
       try {
         setLoading(true);
-        
+
         // 并行加载留言和话题数据
         const [messagesResponse, topicsResponse] = await Promise.all([
           communityService.getMessages(1, 8), // 获取最新8条留言
@@ -71,11 +71,11 @@ const HomePage: React.FC = () => {
 
     // 设置实时订阅
     console.log('首页：设置实时订阅...');
-    
+
     const messagesSubscription = communityService.subscribeToMessages((payload) => {
       console.log('🔥 首页留言实时更新:', payload);
       setLastUpdate(new Date());
-      
+
       if (payload.eventType === 'INSERT') {
         console.log('📝 新留言插入:', payload.new);
         // 新留言插入，添加到列表开头，保持最多8条
@@ -95,13 +95,13 @@ const HomePage: React.FC = () => {
       } else if (payload.eventType === 'UPDATE') {
         console.log('🔄 留言更新:', payload.new);
         // 留言更新（如点赞）
-        setMessages(prev => prev.map(msg => 
-          msg.id === payload.new.id 
+        setMessages(prev => prev.map(msg =>
+          msg.id === payload.new.id
             ? {
-                ...msg,
-                likes: payload.new.likes,
-                replies: payload.new.replies
-              }
+              ...msg,
+              likes: payload.new.likes,
+              replies: payload.new.replies
+            }
             : msg
         ));
       }
@@ -110,7 +110,7 @@ const HomePage: React.FC = () => {
     const topicsSubscription = communityService.subscribeToTopics((payload) => {
       console.log('🔥 首页话题实时更新:', payload);
       setLastUpdate(new Date());
-      
+
       if (payload.eventType === 'INSERT') {
         console.log('📋 新话题插入:', payload.new);
         // 新话题插入
@@ -132,15 +132,15 @@ const HomePage: React.FC = () => {
       } else if (payload.eventType === 'UPDATE') {
         console.log('🔄 话题更新:', payload.new);
         // 话题更新
-        setTopics(prev => prev.map(topic => 
-          topic.id === payload.new.id 
+        setTopics(prev => prev.map(topic =>
+          topic.id === payload.new.id
             ? {
-                ...topic,
-                messages: payload.new.messages || 0,
-                participants: payload.new.participants || 0,
-                lastActivity: new Date(payload.new.last_activity),
-                trending: payload.new.trending
-              }
+              ...topic,
+              messages: payload.new.messages || 0,
+              participants: payload.new.participants || 0,
+              lastActivity: new Date(payload.new.last_activity),
+              trending: payload.new.trending
+            }
             : topic
         ));
       }
@@ -164,7 +164,7 @@ const HomePage: React.FC = () => {
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const minutes = Math.floor(diff / (1000 * 60));
-    
+
     if (minutes < 1) return '刚刚';
     if (minutes < 60) return `${minutes}分钟前`;
     if (minutes < 1440) return `${Math.floor(minutes / 60)}小时前`;
@@ -179,9 +179,9 @@ const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* 实时状态指示器 */}
-      <RealtimeIndicator 
-        isConnected={isRealtimeConnected} 
-        lastUpdate={lastUpdate} 
+      <RealtimeIndicator
+        isConnected={isRealtimeConnected}
+        lastUpdate={lastUpdate}
       />
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -204,7 +204,7 @@ const HomePage: React.FC = () => {
             transition={{ duration: 1 }}
             className="mb-8"
           >
-            <div className="flex items-center justify-center mb-6">
+            <div className="flex items-center justify-center mb-12">
               <Sparkles className="h-16 w-16 text-yellow-400 mr-4 animate-pulse" />
               <Zap className="h-20 w-20 text-blue-400" />
               <Sparkles className="h-16 w-16 text-pink-400 ml-4 animate-pulse" />
@@ -218,7 +218,7 @@ const HomePage: React.FC = () => {
               text="🐕 人才认证 • 更好的Rules • MCP服务 • 有机AI项目"
               className="text-2xl md:text-4xl text-gray-600 mb-8 font-light"
             />
-            
+
             <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-12">
               在Vibe Coding时代，真正稀缺的不是代码，而是经过认证的人才、精心设计的规则、强大的MCP服务，以及未被AI污染的有机项目
             </p>
@@ -267,11 +267,11 @@ const HomePage: React.FC = () => {
                 size="lg"
                 className="backdrop-blur-md bg-gradient-to-r from-amber-500/90 to-yellow-600/90 border-2 border-amber-600/90 text-white hover:from-amber-600/95 hover:to-yellow-700/95 hover:border-amber-700/95 shadow-xl hover:shadow-2xl hover:shadow-amber-500/25 transition-all duration-300 group"
               >
-                🐾 开始体验
+                🚀 Vibe体验
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            
+
             <Link to="/about">
               <Button
                 variant="outline"
@@ -295,7 +295,7 @@ const HomePage: React.FC = () => {
           <div className="absolute bottom-20 right-20 w-32 h-32 bg-purple-200/20 rounded-full blur-2xl animate-pulse delay-1000"></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-200/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
         </div>
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -311,7 +311,7 @@ const HomePage: React.FC = () => {
               在AI代码泛滥的时代，我们专注于发现和认证真正稀缺的价值资源
             </p>
           </motion.div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
@@ -361,15 +361,17 @@ const HomePage: React.FC = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
+
             <AnimatedText 
               text="🐶 Vibe 时代四大稀缺资源"
+
               className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-amber-600 to-yellow-500 bg-clip-text text-transparent mb-6"
             />
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               在AI代码泛滥的时代，这四种资源变得极其珍贵和稀缺
             </p>
           </motion.div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
@@ -426,7 +428,7 @@ const HomePage: React.FC = () => {
           <div className="absolute bottom-10 right-10 w-40 h-40 bg-purple-200/20 rounded-full blur-2xl animate-pulse delay-1000"></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-pink-200/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
         </div>
-        
+
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -462,7 +464,7 @@ const HomePage: React.FC = () => {
               </div>
             </div>
           </motion.div>
-          
+
           <div className="text-center">
             <div className="backdrop-blur-md bg-white/10 rounded-3xl p-8 border border-amber-200/30 hover:bg-white/20 hover:border-amber-300/50 transition-all duration-300 max-w-4xl mx-auto hover:shadow-xl hover:shadow-amber-500/20">
               <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">🐶 <span className="bg-gradient-to-r from-amber-600 to-yellow-500 bg-clip-text text-transparent">VibeDoge</span> 奖池</h3>
@@ -470,7 +472,7 @@ const HomePage: React.FC = () => {
                 <div className="text-4xl font-bold bg-gradient-to-r from-amber-500 to-yellow-500 bg-clip-text text-transparent mb-2">1,234.56 ETH</div>
                 <div className="text-gray-600">≈ <span className="text-amber-600 font-semibold">$2,468,912 USD</span></div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 <div className="backdrop-blur-sm bg-white/75 border border-amber-200/50 rounded-xl p-4 text-center">
                   <div className="text-sm text-gray-600 mb-1">Vibe 创作者</div>
@@ -485,7 +487,7 @@ const HomePage: React.FC = () => {
                   <div className="text-lg font-semibold text-green-600">1/8,765</div>
                 </div>
               </div>
-              
+
               <Link to="/lottery/detail">
                 <Button className="w-full backdrop-blur-md bg-gradient-to-r from-amber-500/90 to-yellow-600/90 border border-amber-600/90 text-white hover:from-amber-600/95 hover:to-yellow-700/95 hover:border-amber-700/95 font-semibold py-3 text-lg shadow-lg hover:shadow-xl hover:shadow-amber-500/25 transition-all duration-300">
                   🐾 加入 VibeDoge 创意之旅
@@ -535,7 +537,7 @@ const HomePage: React.FC = () => {
               </div>
             </div>
           </motion.div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* 实时留言流 */}
             <motion.div
@@ -556,7 +558,7 @@ const HomePage: React.FC = () => {
                     <span className="text-sm">实时更新</span>
                   </div>
                 </div>
-                
+
                 {/* 留言列表 */}
                 <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar">
                   {loading ? (
@@ -616,7 +618,7 @@ const HomePage: React.FC = () => {
                     ))
                   )}
                 </div>
-                
+
                 {/* 快速发言 */}
                 <div className="mt-6 pt-6 border-t border-slate-700">
                   <div className="flex space-x-3">
@@ -653,7 +655,7 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
             </motion.div>
-            
+
             {/* 侧边栏：用户头像墙和热门话题 */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
@@ -714,7 +716,7 @@ const HomePage: React.FC = () => {
                   还有更多用户在线...
                 </p>
               </div>
-              
+
               {/* 热门话题 */}
               <div className="backdrop-blur-md bg-white/75 rounded-2xl p-6 border border-white/90">
                 <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
@@ -760,7 +762,7 @@ const HomePage: React.FC = () => {
                   )}
                 </div>
               </div>
-              
+
               {/* 社区统计 */}
               <div className="backdrop-blur-md bg-white/75 rounded-2xl p-6 border border-white/90">
                 <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
@@ -799,7 +801,7 @@ const HomePage: React.FC = () => {
           <div className="absolute bottom-10 right-10 w-40 h-40 bg-purple-200/20 rounded-full blur-2xl animate-pulse delay-1000"></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-200/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
         </div>
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -820,7 +822,7 @@ const HomePage: React.FC = () => {
               融合 Vibe Coding 理念的智能协作平台，连接创新思维与前沿技术，释放无限创造力
             </p>
           </motion.div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
             {/* 智能助手 */}
             <motion.div
@@ -854,7 +856,7 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
             </motion.div>
-            
+
             {/* 实时数据 */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -887,7 +889,7 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
             </motion.div>
-            
+
             {/* 安全保障 */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -921,7 +923,7 @@ const HomePage: React.FC = () => {
               </div>
             </motion.div>
           </div>
-          
+
           {/* CTA按钮 */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -950,7 +952,7 @@ const HomePage: React.FC = () => {
                 </Button>
               </Link>
             </div>
-            
+
             <p className="text-gray-600 mt-6 text-sm">
               🐕 感受 Vibe Coding 时代的创新魅力，开启数字资产新纪元
             </p>
